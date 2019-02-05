@@ -8,7 +8,11 @@ import paramiko as paramiko
 class DockerHandler:
     # Setup stage: Pull and Run the latest Nginx version from docker hub (nginx:latest)
     # in order to keep the execution remotly, ssh is used to wrap the docker commands.
-    def __init__(self, hostname, username, password):
+    def __init__(self, hostname, username, password, ssh_key=''):
+        if ssh_key:
+            self.ssh_key = ssh_key
+        else:
+            self.ssh_key = None
         self.username = username
         self.hostname = hostname
         self.password = password
@@ -19,7 +23,7 @@ class DockerHandler:
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             self.ssh.connect(self.hostname, username=self.username, password=self.password,
-                             key_filename='C:\google_ubuntu.ppk')
+                             key_filename=self.ssh_key)
         except (AuthenticationException, BadHostKeyException) as e:
             raise e
         (stdin, stdout, stderr) = self.ssh.exec_command(command, get_pty=True, timeout=5)
