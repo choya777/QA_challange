@@ -1,14 +1,18 @@
-from random import choice
-
 import pytest
 
 from docker import DockerHandler
 from httphandler import HttpHadler
 
-url = '34.73.108.93'
+# external IP / hostname of the remoite machine
+url = '127.0.0.1'
+# the name of the image that will be pulled from docker hub
 image = 'nginx'
+# username for ssh
 user = 'qa'
+# password for ssh
 password = 'Challenge'
+# ssh private ke location, mandatory for login to GCE machine
+ssh_key = 'C:\google_ubuntu.ppk'
 
 
 def check_response_code(response, expected_stauts, data=None):
@@ -35,12 +39,12 @@ def http_connection():
 
 @pytest.fixture()
 def ssh_connection():
-    return DockerHandler(url, user, password)
+    return DockerHandler(url, user, password, ssh_key=None)
 
 
 @pytest.fixture()
 def e2e():
-    docker = DockerHandler(url, user, password)
+    docker = DockerHandler(url, user, password, ssh_key)
     # stop running docker if exists
     docker.stop(image)
     # removes image if exists.
